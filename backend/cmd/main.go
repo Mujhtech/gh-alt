@@ -6,6 +6,7 @@ import (
 
 	"github.com/Mujhtech/gh-alt/backend/internal/api"
 	"github.com/Mujhtech/gh-alt/backend/internal/database"
+	"github.com/Mujhtech/gh-alt/backend/internal/git"
 	"github.com/Mujhtech/gh-alt/backend/internal/middleware"
 	"github.com/gorilla/mux"
 )
@@ -44,6 +45,10 @@ func main() {
 		w.WriteHeader(http.StatusOK)
 		w.Write([]byte("OK"))
 	}).Methods("GET")
+
+	// Git HTTP smart protocol routes
+	gitHandler := git.NewGitHTTPHandler(db)
+	router.PathPrefix("/git/").Handler(http.StripPrefix("/git", gitHandler))
 
 	log.Println("Server starting on :8080")
 	log.Fatal(http.ListenAndServe(":8080", router))

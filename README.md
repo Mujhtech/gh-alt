@@ -8,6 +8,7 @@ A GitHub alternative built with Go for the backend and React + Vite for the fron
 - **Repository Management**: Create and view repositories
 - **Commit History**: Track and view commits for each repository
 - **File Browser**: View files and their content in repositories
+- **Git Client Support**: Full Git protocol support for push/pull/clone operations
 - **Modern UI**: Dark-themed GitHub-inspired interface
 
 ## Tech Stack
@@ -18,6 +19,8 @@ A GitHub alternative built with Go for the backend and React + Vite for the fron
 - SQLite (Database)
 - JWT (Authentication)
 - bcrypt (Password hashing)
+- go-git (Git operations)
+- Git HTTP Smart Protocol
 
 ### Frontend
 - React
@@ -39,6 +42,7 @@ Create a `.env` file or set these environment variables:
 - `JWT_SECRET`: Secret key for JWT token signing (default: dev-secret-key-change-in-production)
 - `CORS_ORIGIN`: Allowed CORS origin (default: * for development, set to specific domain in production)
 - `DATABASE_PATH`: Path to SQLite database file (default: ./gh-alt.db)
+- `REPOS_DIR`: Directory to store Git repositories (default: ./repositories)
 
 Example:
 ```bash
@@ -85,6 +89,32 @@ npm run dev
 
 The frontend will be available at `http://localhost:5173`
 
+## Using Git Client
+
+Once you've created a repository through the web interface, you can use standard Git commands to interact with it:
+
+### Clone a Repository
+```bash
+git clone http://localhost:8080/git/my-repo
+```
+
+### Push to a Repository
+```bash
+cd my-project
+git init
+git add .
+git commit -m "Initial commit"
+git remote add origin http://localhost:8080/git/my-repo
+git push -u origin master
+```
+
+### Pull from a Repository
+```bash
+git pull origin master
+```
+
+**Note**: The repository name in the Git URL should match the repository name created in the web UI.
+
 ## API Endpoints
 
 ### Authentication
@@ -98,6 +128,11 @@ The frontend will be available at `http://localhost:5173`
 - `GET /api/repositories/:id/files` - Get repository files
 - `GET /api/repositories/:id/commits` - Get repository commits
 - `POST /api/repositories/:id/commit` - Create a new commit (requires auth)
+
+### Git Protocol
+- `GET /git/:repo/info/refs` - Git info/refs (smart HTTP)
+- `POST /git/:repo/git-upload-pack` - Git upload pack (clone/fetch)
+- `POST /git/:repo/git-receive-pack` - Git receive pack (push)
 
 ## Project Structure
 

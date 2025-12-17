@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/Mujhtech/gh-alt/backend/internal/git"
 	"github.com/Mujhtech/gh-alt/backend/internal/models"
 	"github.com/Mujhtech/gh-alt/backend/pkg/auth"
 	"github.com/gorilla/mux"
@@ -149,6 +150,12 @@ func CreateRepository(db *sql.DB) http.HandlerFunc {
 		repoID, _ := result.LastInsertId()
 		repo.ID = int(repoID)
 		repo.CreatedAt = time.Now()
+
+		// Initialize Git repository on filesystem
+		if err := git.InitRepository(repo.ID, repo.Name); err != nil {
+			http.Error(w, "Failed to initialize Git repository", http.StatusInternalServerError)
+			return
+		}
 
 		// Create initial commit
 		hash := generateHash(fmt.Sprintf("%s-%d", repo.Name, repoID))

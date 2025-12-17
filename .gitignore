@@ -1,6 +1,7 @@
 # Go
 *.db
 backend/server
+repositories/
 
 # Frontend
 node_modules/
