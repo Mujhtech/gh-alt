@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import { repositoryService } from '../services/api';
+import { useAuth } from '../context/AuthContext';
 
 const Repository = () => {
   const { id } = useParams();
@@ -9,6 +10,7 @@ const Repository = () => {
   const [files, setFiles] = useState([]);
   const [activeTab, setActiveTab] = useState('files');
   const [selectedFile, setSelectedFile] = useState(null);
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     loadRepository();
@@ -43,6 +45,24 @@ const Repository = () => {
     }
   };
 
+  const handleStar = async () => {
+    try {
+      await repositoryService.star(id);
+      loadRepository();
+    } catch (error) {
+      console.error('Failed to star repository:', error);
+    }
+  };
+
+  const handleFork = async () => {
+    try {
+      await repositoryService.fork(id);
+      alert('Repository forked successfully!');
+    } catch (error) {
+      console.error('Failed to fork repository:', error);
+    }
+  };
+
   if (!repository) {
     return <div style={styles.container}>Loading...</div>;
   }
@@ -50,10 +70,25 @@ const Repository = () => {
   return (
     <div style={styles.container}>
       <div style={styles.header}>
-        <h1 style={styles.repoName}>{repository.name}</h1>
+        <div style={styles.headerTop}>
+          <h1 style={styles.repoName}>{repository.name}</h1>
+          {isAuthenticated && (
+            <div style={styles.actions}>
+              <button onClick={handleStar} style={styles.actionButton}>
+                ⭐ Star ({repository.stars_count})
+              </button>
+              <button onClick={handleFork} style={styles.actionButton}>
+                🍴 Fork ({repository.forks_count})
+              </button>
+            </div>
+          )}
+        </div>
         <p style={styles.repoDesc}>{repository.description || 'No description'}</p>
         <div style={styles.repoMeta}>
           <span>Owner: {repository.owner_name}</span>
+          <span>⭐ {repository.stars_count} stars</span>
+          <span>🍴 {repository.forks_count} forks</span>
+          <span>👀 {repository.watchers_count} watching</span>
           <span>Created: {new Date(repository.created_at).toLocaleDateString()}</span>
         </div>
       </div>
@@ -71,6 +106,9 @@ const Repository = () => {
         >
           Commits ({commits.length})
         </button>
+        <Link to={`/repository/${id}/issues`} style={styles.tab}>
+          Issues ({repository.open_issues_count})
+        </Link>
       </div>
 
       {activeTab === 'files' && (
@@ -132,10 +170,29 @@ const styles = {
   header: {
     marginBottom: '2rem',
   },
+  headerTop: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: '0.5rem',
+  },
   repoName: {
     fontSize: '2rem',
     color: '#58a6ff',
-    marginBottom: '0.5rem',
+    margin: 0,
+  },
+  actions: {
+    display: 'flex',
+    gap: '0.5rem',
+  },
+  actionButton: {
+    backgroundColor: '#21262d',
+    color: '#fff',
+    border: '1px solid #30363d',
+    padding: '0.5rem 1rem',
+    borderRadius: '6px',
+    cursor: 'pointer',
+    fontSize: '0.875rem',
   },
   repoDesc: {
     color: '#8b949e',

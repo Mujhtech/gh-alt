@@ -54,6 +54,51 @@ export const repositoryService = {
     const response = await api.post(`/repositories/${id}/commit`, { message, author, files });
     return response.data;
   },
+  star: async (id) => {
+    const response = await api.put(`/repositories/${id}/star`);
+    return response.data;
+  },
+  unstar: async (id) => {
+    const response = await api.delete(`/repositories/${id}/star`);
+    return response.data;
+  },
+  watch: async (id) => {
+    const response = await api.put(`/repositories/${id}/watch`);
+    return response.data;
+  },
+  unwatch: async (id) => {
+    const response = await api.delete(`/repositories/${id}/watch`);
+    return response.data;
+  },
+  fork: async (id) => {
+    const response = await api.post(`/repositories/${id}/fork`);
+    return response.data;
+  },
+  getIssues: async (id, state = 'open') => {
+    const response = await api.get(`/repositories/${id}/issues?state=${state}`);
+    return response.data;
+  },
+  createIssue: async (id, title, body) => {
+    const response = await api.post(`/repositories/${id}/issues`, { title, body });
+    return response.data;
+  },
+  getPullRequests: async (id, state = 'open') => {
+    const response = await api.get(`/repositories/${id}/pulls?state=${state}`);
+    return response.data;
+  },
+  createPullRequest: async (id, title, body, headBranch, baseBranch) => {
+    const response = await api.post(`/repositories/${id}/pulls`, { 
+      title, body, head_branch: headBranch, base_branch: baseBranch 
+    });
+    return response.data;
+  },
+};
+
+export const searchService = {
+  search: async (query, type = '') => {
+    const response = await api.get(`/search?q=${encodeURIComponent(query)}&type=${type}`);
+    return response.data;
+  },
 };
 
 export default api;

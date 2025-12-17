@@ -39,6 +39,27 @@ func main() {
 	apiRouter.HandleFunc("/repositories/{id}/files", api.GetRepositoryFiles(db)).Methods("GET", "OPTIONS")
 	apiRouter.HandleFunc("/repositories/{id}/commits", api.GetRepositoryCommits(db)).Methods("GET", "OPTIONS")
 	apiRouter.HandleFunc("/repositories/{id}/commit", middleware.AuthMiddleware(api.CreateCommit(db))).Methods("POST", "OPTIONS")
+	
+	// Star/Watch/Fork routes
+	apiRouter.HandleFunc("/repositories/{id}/star", middleware.AuthMiddleware(api.StarRepository(db))).Methods("PUT", "OPTIONS")
+	apiRouter.HandleFunc("/repositories/{id}/star", middleware.AuthMiddleware(api.UnstarRepository(db))).Methods("DELETE", "OPTIONS")
+	apiRouter.HandleFunc("/repositories/{id}/watch", middleware.AuthMiddleware(api.WatchRepository(db))).Methods("PUT", "OPTIONS")
+	apiRouter.HandleFunc("/repositories/{id}/watch", middleware.AuthMiddleware(api.UnwatchRepository(db))).Methods("DELETE", "OPTIONS")
+	apiRouter.HandleFunc("/repositories/{id}/fork", middleware.AuthMiddleware(api.ForkRepository(db))).Methods("POST", "OPTIONS")
+	
+	// Issue routes
+	apiRouter.HandleFunc("/repositories/{id}/issues", api.GetIssues(db)).Methods("GET", "OPTIONS")
+	apiRouter.HandleFunc("/repositories/{id}/issues", middleware.AuthMiddleware(api.CreateIssue(db))).Methods("POST", "OPTIONS")
+	apiRouter.HandleFunc("/repositories/{id}/issues/{number}", middleware.AuthMiddleware(api.UpdateIssue(db))).Methods("PATCH", "OPTIONS")
+	apiRouter.HandleFunc("/repositories/{id}/issues/{number}/comments", middleware.AuthMiddleware(api.AddIssueComment(db))).Methods("POST", "OPTIONS")
+	
+	// Pull Request routes
+	apiRouter.HandleFunc("/repositories/{id}/pulls", api.GetPullRequests(db)).Methods("GET", "OPTIONS")
+	apiRouter.HandleFunc("/repositories/{id}/pulls", middleware.AuthMiddleware(api.CreatePullRequest(db))).Methods("POST", "OPTIONS")
+	apiRouter.HandleFunc("/repositories/{id}/pulls/{number}/merge", middleware.AuthMiddleware(api.MergePullRequest(db))).Methods("POST", "OPTIONS")
+	
+	// Search routes
+	apiRouter.HandleFunc("/search", api.SearchAll(db)).Methods("GET", "OPTIONS")
 
 	// Health check
 	router.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {

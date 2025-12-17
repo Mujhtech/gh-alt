@@ -53,6 +53,12 @@ const Home = () => {
             <Link to={`/repository/${repo.id}`} key={repo.id} style={styles.repoCard}>
               <h3 style={styles.repoName}>{repo.name}</h3>
               <p style={styles.repoDesc}>{repo.description || 'No description'}</p>
+              <div style={styles.repoStats}>
+                <span>⭐ {repo.stars_count}</span>
+                <span>🍴 {repo.forks_count}</span>
+                <span>👀 {repo.watchers_count}</span>
+                <span>🐛 {repo.open_issues_count} issues</span>
+              </div>
               <div style={styles.repoMeta}>
                 <span>by {repo.owner_name}</span>
                 <span>{new Date(repo.created_at).toLocaleDateString()}</span>
@@ -146,6 +152,13 @@ const styles = {
   },
   repoDesc: {
     color: '#8b949e',
+    marginBottom: '0.5rem',
+  },
+  repoStats: {
+    display: 'flex',
+    gap: '1.5rem',
+    color: '#8b949e',
+    fontSize: '0.875rem',
     marginBottom: '1rem',
   },
   repoMeta: {

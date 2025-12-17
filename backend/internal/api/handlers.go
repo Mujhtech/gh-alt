@@ -93,7 +93,8 @@ func Login(db *sql.DB) http.HandlerFunc {
 func GetRepositories(db *sql.DB) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		rows, err := db.Query(`
-			SELECT r.id, r.name, r.description, r.owner_id, u.username, r.is_private, r.created_at
+			SELECT r.id, r.name, r.description, r.owner_id, u.username, r.is_private, 
+			       r.stars_count, r.forks_count, r.watchers_count, r.open_issues_count, r.created_at
 			FROM repositories r
 			JOIN users u ON r.owner_id = u.id
 			WHERE r.is_private = 0
@@ -108,7 +109,9 @@ func GetRepositories(db *sql.DB) http.HandlerFunc {
 		var repositories []models.Repository
 		for rows.Next() {
 			var repo models.Repository
-			rows.Scan(&repo.ID, &repo.Name, &repo.Description, &repo.OwnerID, &repo.OwnerName, &repo.IsPrivate, &repo.CreatedAt)
+			rows.Scan(&repo.ID, &repo.Name, &repo.Description, &repo.OwnerID, &repo.OwnerName, 
+				&repo.IsPrivate, &repo.StarsCount, &repo.ForksCount, &repo.WatchersCount,
+				&repo.OpenIssuesCount, &repo.CreatedAt)
 			repositories = append(repositories, repo)
 		}
 
@@ -177,11 +180,14 @@ func GetRepository(db *sql.DB) http.HandlerFunc {
 
 		var repo models.Repository
 		err := db.QueryRow(`
-			SELECT r.id, r.name, r.description, r.owner_id, u.username, r.is_private, r.created_at
+			SELECT r.id, r.name, r.description, r.owner_id, u.username, r.is_private,
+			       r.stars_count, r.forks_count, r.watchers_count, r.open_issues_count, r.created_at
 			FROM repositories r
 			JOIN users u ON r.owner_id = u.id
 			WHERE r.id = ?
-		`, id).Scan(&repo.ID, &repo.Name, &repo.Description, &repo.OwnerID, &repo.OwnerName, &repo.IsPrivate, &repo.CreatedAt)
+		`, id).Scan(&repo.ID, &repo.Name, &repo.Description, &repo.OwnerID, &repo.OwnerName,
+			&repo.IsPrivate, &repo.StarsCount, &repo.ForksCount, &repo.WatchersCount,
+			&repo.OpenIssuesCount, &repo.CreatedAt)
 
 		if err != nil {
 			http.Error(w, "Repository not found", http.StatusNotFound)
