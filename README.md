@@ -32,6 +32,21 @@ A GitHub alternative built with Go for the backend and React + Vite for the fron
 - Node.js 18 or higher
 - npm or yarn
 
+### Environment Variables
+
+#### Backend
+Create a `.env` file or set these environment variables:
+- `JWT_SECRET`: Secret key for JWT token signing (default: dev-secret-key-change-in-production)
+- `CORS_ORIGIN`: Allowed CORS origin (default: * for development, set to specific domain in production)
+- `DATABASE_PATH`: Path to SQLite database file (default: ./gh-alt.db)
+
+Example:
+```bash
+export JWT_SECRET="your-super-secret-jwt-key"
+export CORS_ORIGIN="http://localhost:5173"
+export DATABASE_PATH="./data/gh-alt.db"
+```
+
 ### Backend Setup
 
 1. Navigate to the project root:

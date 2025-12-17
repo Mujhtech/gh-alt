@@ -2,13 +2,23 @@ package auth
 
 import (
 	"errors"
+	"os"
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
 )
 
-var jwtSecret = []byte("your-secret-key-change-in-production")
+var jwtSecret = getJWTSecret()
+
+func getJWTSecret() []byte {
+	secret := os.Getenv("JWT_SECRET")
+	if secret == "" {
+		// Use a default for development only
+		secret = "dev-secret-key-change-in-production"
+	}
+	return []byte(secret)
+}
 
 type Claims struct {
 	UserID   int    `json:"user_id"`

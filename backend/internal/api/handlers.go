@@ -128,9 +128,14 @@ func CreateRepository(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		// For simplicity, use a default owner_id of 1
-		// In production, extract from JWT token
-		repo.OwnerID = 1
+		// Extract user ID from context (set by AuthMiddleware)
+		userID, ok := r.Context().Value("user_id").(int)
+		if !ok {
+			http.Error(w, "Unauthorized", http.StatusUnauthorized)
+			return
+		}
+
+		repo.OwnerID = userID
 
 		result, err := db.Exec(
 			"INSERT INTO repositories (name, description, owner_id, is_private) VALUES (?, ?, ?, ?)",
