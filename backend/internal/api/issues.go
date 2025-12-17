@@ -18,7 +18,7 @@ func GetIssues(db *sql.DB) http.HandlerFunc {
 		repoID := vars["id"]
 		state := r.URL.Query().Get("state")
 		if state == "" {
-			state = "all"
+			state = "open"
 		}
 
 		query := `

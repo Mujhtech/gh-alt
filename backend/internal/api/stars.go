@@ -20,14 +20,17 @@ func StarRepository(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		_, err := db.Exec("INSERT OR IGNORE INTO stars (user_id, repository_id) VALUES (?, ?)",
+		result, err := db.Exec("INSERT OR IGNORE INTO stars (user_id, repository_id) VALUES (?, ?)",
 			userID, repoID)
 		if err != nil {
 			http.Error(w, "Failed to star repository", http.StatusInternalServerError)
 			return
 		}
 
-		db.Exec("UPDATE repositories SET stars_count = stars_count + 1 WHERE id = ?", repoID)
+		rowsAffected, _ := result.RowsAffected()
+		if rowsAffected > 0 {
+			db.Exec("UPDATE repositories SET stars_count = stars_count + 1 WHERE id = ?", repoID)
+		}
 
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(map[string]string{"status": "starred"})
@@ -75,14 +78,17 @@ func WatchRepository(db *sql.DB) http.HandlerFunc {
 			return
 		}
 
-		_, err := db.Exec("INSERT OR IGNORE INTO watchers (user_id, repository_id) VALUES (?, ?)",
+		result, err := db.Exec("INSERT OR IGNORE INTO watchers (user_id, repository_id) VALUES (?, ?)",
 			userID, repoID)
 		if err != nil {
 			http.Error(w, "Failed to watch repository", http.StatusInternalServerError)
 			return
 		}
 
-		db.Exec("UPDATE repositories SET watchers_count = watchers_count + 1 WHERE id = ?", repoID)
+		rowsAffected, _ := result.RowsAffected()
+		if rowsAffected > 0 {
+			db.Exec("UPDATE repositories SET watchers_count = watchers_count + 1 WHERE id = ?", repoID)
+		}
 
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(map[string]string{"status": "watching"})
