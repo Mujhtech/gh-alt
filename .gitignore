@@ -1,0 +1,19 @@
+# Go
+*.db
+backend/server
+repositories/
+
+# Frontend
+node_modules/
+dist/
+.vite/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
